@@ -27,25 +27,33 @@ Setup:
             inside container run
                 to find ip
                     cat /etc/hosts
+                    
                 apt update
                 apt install iperf3
                 iperf3 --server
+
     Capture arp and icmp packets​
+
         sudo ./bin/capture 100 docker0 &
         sudo arpsend -D -e 172.17.0.2 docker0 &
         ping 172.17.0.2 -i 0.01 -c 49
         ./bin/analyse
+    
     Capture large traffic​
+    
         sudo ./bin/capture 1000 docker0 &
         iperf3 --client 172.17.0.2 --time 1
         ./bin/analyse
 
 
     Filter tcp and icmp packets​
+    
         sudo ./bin/filter docker0 "tcp or icmp"
         ping 172.17.0.2 -i 0.01 -c 200 &
         iperf3 --client 172.17.0.2 --time 3
+
     Capture only icmp packets​
+    
         sudo ./bin/filter docker0 icmp 
         ping 172.17.0.2 -i 0.01 -c 200 &
         iperf3 --client 172.17.0.2 --time 3
