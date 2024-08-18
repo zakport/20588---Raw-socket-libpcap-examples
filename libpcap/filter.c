@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     int timeout_limit = 1000; /* In milliseconds */
     pcap_t *handle = pcap_open_live(
         device,
-        BUFSIZ,
+        65550,
         promisc,
         timeout_limit,
         error_buffer);
@@ -70,23 +70,28 @@ int main(int argc, char *argv[])
         net = 0;
         mask = 0;
     }
-    struct bpf_program fp;            /* The compiled filter expression */
-    char *filter_exp = "tcp or icmp"; /* The filter expression */
+    printf("User Space filtering all but icmp packets\n");
+    struct bpf_program fp; /* The compiled filter expression */
+    char *filter_exp = ""; /* The filter expression */
     if (argc > 2)
     {
         filter_exp = argv[2];
     }
-    printf("Filtering all but %s packets\n", filter_exp);
-    if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1)
+    if (*filter_exp != '\0')
     {
-        fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
-        return (2);
+        printf("BPF Filtering all but %s packets\n", filter_exp);
+        if (pcap_compile(handle, &fp, filter_exp, 0, net) == -1)
+        {
+            fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
+            return (2);
+        }
+        if (pcap_setfilter(handle, &fp) == -1)
+        {
+            fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
+            return (2);
+        }
     }
-    if (pcap_setfilter(handle, &fp) == -1)
-    {
-        fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
-        return (2);
-    }
+    
 
     const uint8_t *packet;
     struct pcap_pkthdr *packet_header;
@@ -108,7 +113,9 @@ int main(int argc, char *argv[])
             icmp_count++;
         else
         {
+            //don't waste any time on non ICMP packets
             other++;
+            continue;
         }
 
         /* Our function to output some info */

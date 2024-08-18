@@ -27,7 +27,7 @@ Setup:
             inside container run
                 to find ip
                     cat /etc/hosts
-                    
+
                 apt update
                 apt install iperf3
                 iperf3 --server
@@ -45,17 +45,26 @@ Setup:
         iperf3 --client 172.17.0.2 --time 1
         ./bin/analyse
 
+    For monitoring filter Cpu usage
+        top
+        iperf3 --client 172.17.0.2 --time 30
+        sudo ./bin/filter docker0
+        or
+        sudo ./bin/filter docker0 icmp
 
     Filter tcp and icmp packets​
     
-        sudo ./bin/filter docker0 "tcp or icmp"
-        ping 172.17.0.2 -i 0.01 -c 200 &
-        iperf3 --client 172.17.0.2 --time 3
+        sudo ./bin/filter docker0
+        First:
+            ping 172.17.0.2 -i 0.002 -c 1000
+        Then:
+            ping 172.17.0.2 -i 0.002 -c 1000 &
+            iperf3 --client 172.17.0.2 --time 3
 
     Capture only icmp packets​
     
         sudo ./bin/filter docker0 icmp 
-        ping 172.17.0.2 -i 0.01 -c 200 &
+        ping 172.17.0.2 -i 0.002 -c 1000 &
         iperf3 --client 172.17.0.2 --time 3
 
 
