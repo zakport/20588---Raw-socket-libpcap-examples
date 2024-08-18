@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     {
         device = argv[2];
     }
-    // not in use, currently capture on all devices if not specified
+
     else
     {
 
@@ -59,19 +59,7 @@ int main(int argc, char *argv[])
     else
     {
         printf("Capturing on device: %s\n", device);
-    } // int *dlt_buf;
-    // int num =
-    //     pcap_list_datalinks(handle, &dlt_buf);
-    // for (int i = 0; i < num; i++)
-    // {
-    //     printf("%s\n", pcap_datalink_val_to_description(dlt_buf[i]));
-    // }
-    // // verify that our device provides the headers we are looking for
-    // if (pcap_datalink(handle) != DLT_EN10MB)
-    // {
-    //     fprintf(stderr, "Device %s doesn't provide Ethernet headers - not supported\n", device);
-    //     return (2);
-    // }
+    } 
 
     pcap_dumper_t *dumper;
     char *outputFileName = "pcap_file/dump.pcap";
@@ -84,7 +72,7 @@ int main(int argc, char *argv[])
         printf("Failed reading file\n");
         return 2;
     }
-    printf("Saved %d packets to file: \"%s\"", capNum, outputFileName);
+    printf("Saved %d packets to file: \"%s\"\n", capNum, outputFileName);
     pcap_dump_close(dumper);
 
     pcap_close(handle);
